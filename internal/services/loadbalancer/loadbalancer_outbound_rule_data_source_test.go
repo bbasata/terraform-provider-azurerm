@@ -143,7 +143,7 @@ resource "azurerm_lb_outbound_rule" "test2" {
   name                    = "OutboundRule2-%d"
   protocol                = "Tcp"
   backend_address_pool_id = azurerm_lb_backend_address_pool.test.id
-  enable_tcp_reset        = true
+  tcp_reset_enabled       = true
   idle_timeout_in_minutes = 5
 
   frontend_ip_configuration {
