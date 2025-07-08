@@ -281,6 +281,7 @@ func resourceArmLoadBalancerNatRuleRead(d *pluginsdk.ResourceData, meta interfac
 
 			d.Set("floating_ip_enabled", pointer.From(props.EnableFloatingIP))
 			d.Set("tcp_reset_enabled", pointer.From(props.EnableTcpReset))
+
 			if !features.FivePointOh() {
 				d.Set("enable_floating_ip", pointer.From(props.EnableFloatingIP))
 				d.Set("enable_tcp_reset", pointer.From(props.EnableTcpReset))
@@ -359,14 +360,20 @@ func resourceArmLoadBalancerNatRuleDelete(d *pluginsdk.ResourceData, meta interf
 
 func expandAzureRmLoadBalancerNatRule(d *pluginsdk.ResourceData, lb *loadbalancers.LoadBalancer, loadBalancerId loadbalancers.LoadBalancerId) (*loadbalancers.InboundNatRule, error) {
 	properties := loadbalancers.InboundNatRulePropertiesFormat{
-		Protocol:       pointer.To(loadbalancers.TransportProtocol(d.Get("protocol").(string))),
-		BackendPort:    pointer.To(int64(d.Get("backend_port").(int))),
-		EnableTcpReset: pointer.To(d.Get("tcp_reset_enabled").(bool)),
+		Protocol:    pointer.To(loadbalancers.TransportProtocol(d.Get("protocol").(string))),
+		BackendPort: pointer.To(int64(d.Get("backend_port").(int))),
+	}
+
+	if v, ok := d.GetOk("tcp_reset_enabled"); ok {
+		properties.EnableTcpReset = pointer.To(v.(bool))
 	}
 
 	if !features.FivePointOh() {
-		if v, ok := d.GetOk("enable_tcp_reset"); ok {
+		if v, ok := d.GetOk("enable_floating_ip"); ok {
 			properties.EnableFloatingIP = pointer.To(v.(bool))
+		}
+		if v, ok := d.GetOk("enable_tcp_reset"); ok {
+			properties.EnableTcpReset = pointer.To(v.(bool))
 		}
 	}
 

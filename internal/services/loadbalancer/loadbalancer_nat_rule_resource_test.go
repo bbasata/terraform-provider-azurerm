@@ -309,7 +309,6 @@ resource "azurerm_lb" "test" {
 }
 
 func (r LoadBalancerNatRule) basic(data acceptance.TestData, sku string) string {
-	template := r.template(data, sku)
 	return fmt.Sprintf(`
 %s
 
@@ -322,7 +321,7 @@ resource "azurerm_lb_nat_rule" "test" {
   backend_port                   = 3389
   frontend_ip_configuration_name = azurerm_lb.test.frontend_ip_configuration.0.name
 }
-`, template, data.RandomInteger)
+`, r.template(data, sku), data.RandomInteger)
 }
 
 func (r LoadBalancerNatRule) complete(data acceptance.TestData, sku string) string {
